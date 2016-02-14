@@ -3,6 +3,11 @@ NAME: plt_filter.py
 PURPOSE: Python script for filtering and plotting NPD (Raw mode) data
         Access NPD (RAW mode) Module, NPD_raw_read.py
 
+PROGRAMMER: Emmanuel Nunez (emmnun-4@student.ltu.se)
+
+REFERENCES: Yoshifumi Futaana
+            Xiao-Dong Wang
+
 PARAMS:
 	id: data filename (either netCDF file or file list containing '.nc' file names)
 	-v: optional argument, print information in netCDF file
@@ -128,14 +133,13 @@ class RawPlot(object):
         start_str = time.strftime(d_format, s_time)
         end_str = time.strftime(d_format, e_time)
 
-        info_d = {'Filename': f_name, 'Date': s_date, 'Start': start_str,
-                  'End': end_str, 'dt': dsec}
-
+        info_d = {'Filename': f_name, 'Date': s_date, 'Start': start_str, 'End': end_str, 'dt': dsec}
+        '''
         print('Filename: ', f_name)
         print('Date: ', s_date, ', epoch[day]: ', s_day[0])
         print('GMT:')
         print('Start Time : ', time.strftime(d_format, s_time), ', End Time: ', time.strftime(d_format, e_time))
-
+        '''
         return info_d
 
     def dir_sep(self):  # Direction separation function
@@ -609,8 +613,17 @@ class RawPlot(object):
         path += '/json/'  # new path (sub directory 'json')
         # print (path)
 
+        # Convert to list
+        dir0_phs_h = dir_phs_h['dir0_phs_h'].tolist()
+        dir0_time = dir_phs_h['dir0_time'].tolist()
+        dir1_phs_h = dir_phs_h['dir1_phs_h'].tolist()
+        dir1_time = dir_phs_h['dir1_time'].tolist()
+        dir2_phs_h = dir_phs_h['dir2_phs_h'].tolist()
+        dir2_time = dir_phs_h['dir2_time'].tolist()
+        info = str(info['Date'])
+
         # Dictionary with data info
-        data_file = {'Filename': f_name, 'Info': self.info(), 'dir_phs_h': dir_phs_h}
+        data_file = {'Filename': f_name, 'Info':info, 'dir0_phs_h': dir0_phs_h, 'dir0_time': dir0_time, 'dir1_phs_h': dir1_phs_h, 'dir1_time': dir1_time, 'dir2_phs_h': dir2_phs_h, 'dir2_time': dir2_time}
 
         if file.lower().endswith('.txt'):   # if text file containing list
             # Write to file
@@ -618,40 +631,35 @@ class RawPlot(object):
 
                 print('File already exists!')
                 with open(path + file[:-4] + '.json', 'a') as f:
-                    for keys in data_file:
-                        json.dump(keys, f)
-                        print('appending ' + keys + '...')
-
+                    json.dump(data_file,f, separators=(',', ':'), sort_keys=True, indent=2)
+                    print('appending...')
                     f.write(os.linesep)
                 f.close()
 
             else:
                 with open(path + file[:-4] + '.json', 'w') as f:
-                    for keys in data_file:
-                        json.dump(keys, f)
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
                     f.write(os.linesep)
-            print(open(path + file[:-4] + '.json', 'r').read())
+            #print(open(path + file[:-4] + '.json', 'r').read())
 
         elif file.lower().endswitch('.nc'):
             # Write to file
             if os.path.isfile(path + f_name[:11] + '.json'):  # if file exists,
 
                 print('File already exists!')
-                with open(path + f_name + '.json', 'a') as f:
-                    for keys in data_file:
-                        json.dump(keys, f)
-                        print('appending ' + keys + '...')
+                with open(path + f_name[:11] + '.json', 'a') as f:
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
+                    print('appending...')
 
                     f.write(os.linesep)
                 f.close()
 
             else:
-                with open(path + f_name[:-3] + '.json', 'w') as f:
-                    for keys in data_file:
-                        json.dump(keys, f)
+                with open(path + f_name[:11] + '.json', 'w') as f:
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
                     f.write(os.linesep)
 
-            print(open(path + f_name[:-3] + '.json', 'r').read())
+            #print(open(path + f_name[:-3] + '.json', 'r').read())
 
     @property
     def phbin(self):
@@ -694,6 +702,8 @@ def raw_filter(args):
         # Read file containing list
         with open(full_path, 'r') as f:
             contents = [line.rstrip('\n') for line in f]
+            success = 0
+            failed = 0
             for content in contents:
                 try:
                     full_path = path + '/' + content
@@ -728,13 +738,17 @@ def raw_filter(args):
 
                     if args.store:
                         plot_mask.store(path, nc_f)  # copying
+                        success += 1
                 except ValueError as err:
                     print('Error: ', err)
                     f_error.append(content)
+                    failed += 1
 
             with open(path + '/' + 'Err' + nc_f, 'a') as file:
                 for item in f_error:
                     file.write('%s\n' % item)
+            print('No. of Files saved: ', success)
+            print('No. failed: ', failed)
 
     elif nc_f.lower().endswith('.nc'):
         raw_data = raw.NPD_raw_read(full_path, args.verbose)  # reading netCDF file
