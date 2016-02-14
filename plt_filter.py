@@ -631,14 +631,14 @@ class RawPlot(object):
 
                 print('File already exists!')
                 with open(path + file[:-4] + '.json', 'a') as f:
-                    json.dump(data_file,f, separators=(',', ':'), sort_keys=True, indent=2)
+                    json.dump(data_file,f, separators=(',', ':'), sort_keys=True)
                     print('appending...')
                     f.write(os.linesep)
                 f.close()
 
             else:
                 with open(path + file[:-4] + '.json', 'w') as f:
-                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True)
                     f.write(os.linesep)
             #print(open(path + file[:-4] + '.json', 'r').read())
 
@@ -648,7 +648,7 @@ class RawPlot(object):
 
                 print('File already exists!')
                 with open(path + f_name[:11] + '.json', 'a') as f:
-                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True)
                     print('appending...')
 
                     f.write(os.linesep)
@@ -656,7 +656,7 @@ class RawPlot(object):
 
             else:
                 with open(path + f_name[:11] + '.json', 'w') as f:
-                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True, indent=2)
+                    json.dump(data_file, f, separators=(',', ':'), sort_keys=True)
                     f.write(os.linesep)
 
             #print(open(path + f_name[:-3] + '.json', 'r').read())
