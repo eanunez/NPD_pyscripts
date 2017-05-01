@@ -102,14 +102,15 @@ def NPD_raw_read(id,verb=True):
         Regs = nc_fid.variables['Regs'][:]
 		
         NOR = Time.size
-        discard = np.chararray((NOR, 3)) # string array of NOR rows, 3 colums        
+        discard = np.chararray((NOR, 3)) # string array of NOR rows, 3 colums
+
         #Bit manipulation to assign variables Raw: 32bit-7bit = 25bit, 7bit=spare
         # Check [Grigoriev,2007] for data format
 
-        TOFs = np.bitwise_and(Intens, int('0xfff',0))
-        Phs = np.bitwise_and(np.right_shift(Intens,12), int('0xff',0))
-        Dirs = np.bitwise_and(np.right_shift(Intens,20), int('0x3',0))
-        Coins = np.bitwise_and(np.right_shift(Intens,22), int('0x7',0))
+        TOFs = np.bitwise_and(Intens, int('0xfff',0))   # 0xfff = 12bit masking binary. bitwise_and copies the first 12bits, retains the shape of array
+        Phs = np.bitwise_and(np.right_shift(Intens,12), int('0xff',0))  # 0xff = 8bits masking binary. shift the bits for 12bits to the right and copies the first 8bits
+        Dirs = np.bitwise_and(np.right_shift(Intens,20), int('0x3',0))  # 0x3 = 2bits
+        Coins = np.bitwise_and(np.right_shift(Intens,22), int('0x7',0)) # 0x7 = 3bits
 
         #Create Dictionary with (keys, value) pairs
         raw_data = {'ST':ST, 'ET':ET, 'Time':Time, 'DT':DeltaT, 'Cnts':Cnts, 'Calib':Calib, 'Regs':Regs, 'TOFs':TOFs, 'dirs':Dirs, 'coins':Coins, 'PHs':Phs, 'discard':discard}

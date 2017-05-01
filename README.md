@@ -30,12 +30,18 @@ for more details, see descriptions inside the module/script
 
 Since python3 has given the priority over python2.7, upcoming modules are designed to run for python3.
 
-4) To test plotting for time series PH. This is obsolete and has been replaced with plt_filter.py
-    $ python3 test.py filename -tphs
-
-5) 'plt_filter.py' has the following functionalities: 
+4) 'plt_filter.py' has the following functionalities: 
   - plot time series PH, 
   - stores filtered data to 'json' file for further data manipulation(new created file is based on type of NPD sensor and year)
   - accepts '.nc' file or '.txt' file containing list of '.nc' files as input
 
-   $ python3 plt_filter.py filename -tphs 
+   $ python3 plt_filter.py filename -tph
+
+See script for further details and optional arguments
+
+5) 'timeSeries.py' has the following functionalities:
+  - plots time series Pulse height distribution in each sensor and direction 
+    (both 1D and 2D histogram) for long period, i.e. whole mission
+  - plots time series Time-of-Flight(TOF) - Pulse height (PH)
+    (See script for further details)
+ 
